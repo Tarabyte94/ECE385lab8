@@ -97,14 +97,37 @@ module  lab8 		( input         CLOCK_50,
 										 .otg_hpi_w_export(hpi_w));
 	
 	//Fill in the connections for the rest of the modules 
-    vga_controller vgasync_instance();
+    vga_controller vgasync_instance(
+												  .Clk(Clk),       // 50 MHz clock
+                                      .Reset(Reset_h),     // reset signal
+												  .hs(VGA_HS),        // Horizontal sync pulse.  Active low
+								              .vs(VGA_VS),        // Vertical sync pulse.  Active low
+												  .pixel_clk(VGA_CLK), // 25 MHz pixel clock output
+												  .blank(VGA_BLANK_N),     // Blanking interval indicator.  Active low.
+												  .sync(VGA_SYNC_N),      // Composite Sync signal.  Active low.  We don't use it in this lab,
+												             //   but the video DAC on the DE2 board requires an input for it.
+												  .DrawX(drawxsig),     // horizontal coordinate
+								              .DrawY(drawysig)
+												);
    
     ball ball_instance(
 									.Reset(Reset_h),
 									.frame_clk(),
-									.keycode(keycode));
+									.keycode(keycode)
+									.BallX(ballxsig), 
+									.BallY(ballysig), 
+									.BallS(ballsizesig));
    
-    color_mapper color_instance();
+    color_mapper color_instance(
+									.BallX(ballxsig), 
+									.BallY(ballysig), 
+									.DrawX(drawxsig), 
+									.DrawY(drawysig), 
+									.Ball_size(ballsizesig),
+									.Red(VGA_R), 
+									.Green(VGA_G), 
+									.Blue(VGA_B)
+									);
 										  
 	 HexDriver hex_inst_0 (keycode[3:0], HEX0);
 	 HexDriver hex_inst_1 (keycode[7:4], HEX1);
